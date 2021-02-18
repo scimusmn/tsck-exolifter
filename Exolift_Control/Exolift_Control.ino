@@ -22,15 +22,20 @@ bool lockout = false; //lockout switch active/inactive flag
 Button centerStackButton(button1pin, &centerStackPushed, 20); // pin, function reference, (optional)debounce in milliseconds.
 Button outerStacksButton(button2pin, &outerStacksPushed, 20); // pin, function reference, (optional)debounce in milliseconds.
 Button allStacksButton(button3pin, &allStacksPushed, 20); // pin, function reference, (optional)debounce in milliseconds.
-Button lockoutButton(button4pin, 20); //pin, no function needed here, (optional) debounce in milliseconds
+Button lockoutButton(button4pin,&lockoutSwitched, 20); //pin, no function needed here, (optional) debounce in milliseconds
 
 void setup() {
+  Serial.begin(9600);
   pinMode(LED1, OUTPUT);
   pinMode(LED2, OUTPUT);
   pinMode(LED3, OUTPUT);
 }
 
 //functions tied to button class instances
+
+
+void lockoutSwitched(int state){
+}
 
 void centerStackPushed(int state) {
   if (state && lockoutButton.getState() && outerStacksButton.getState() && allStacksButton.getState()) {
@@ -62,4 +67,5 @@ void loop() {
   centerStackButton.update();
   outerStacksButton.update();
   allStacksButton.update();
+   Serial.println(lockoutButton.getState());
 }
