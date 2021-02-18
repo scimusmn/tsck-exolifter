@@ -1,2 +1,2 @@
 # tsck-exolifter
-Weight stack selector control
+This program monitors the high/low states of three pushbuttons and one lockout switch.  When one of the pushbuttons goes "low", a corrresponding LED turns "on", and the other LEDs turn "off".  The pushbuttons are interlocked, so that when one is pushed, the other two are ignored.  If the lockout switch is set low, all three pushbuttons are ignored, but the last LED that was turned on stays "on"
