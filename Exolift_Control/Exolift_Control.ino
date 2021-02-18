@@ -16,7 +16,6 @@ const int button1pin = 2; //center weight pushbutton
 const int button2pin = 3; //outer weight pushbutton
 const int button3pin = 4; //all-weights pushbutton
 const int button4pin = 5; //lockout switch
-bool lockout = false; //lockout switch active/inactive flag
 
 //Button class instances
 Button centerStackButton(button1pin, &centerStackPushed, 20); // pin, function reference, (optional)debounce in milliseconds.
