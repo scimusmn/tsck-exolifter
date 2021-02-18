@@ -31,9 +31,7 @@ void setup() {
 }
 
 //functions tied to button class instances
-
-
-void lockoutSwitched(int state){
+void lockoutSwitched(int state){ //no tasks here, just placeholder function for creating lockoutButton instance
 }
 
 void centerStackPushed(int state) {
