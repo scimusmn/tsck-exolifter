@@ -66,5 +66,4 @@ void loop() {
   centerStackButton.update();
   outerStacksButton.update();
   allStacksButton.update();
-   Serial.println(lockoutButton.getState());
 }
