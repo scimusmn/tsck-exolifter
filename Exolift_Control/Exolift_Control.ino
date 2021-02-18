@@ -35,7 +35,7 @@ void lockoutSwitched(){ //no tasks here, just placeholder function needed for cr
 }
 
 void centerStackPushed(int state) {
-  if (state && lockoutButton.getState() && outerStacksButton.getState() && allStacksButton.getState()) {
+  if (!state && lockoutButton.getState() && outerStacksButton.getState() && allStacksButton.getState()) {
     digitalWrite(LED1, HIGH);
     digitalWrite(LED2, LOW);
     digitalWrite(LED3, LOW);
@@ -43,7 +43,7 @@ void centerStackPushed(int state) {
 }
 
 void outerStacksPushed(int state) {
-  if (state && lockoutButton.getState() && centerStackButton.getState() && allStacksButton.getState()) {
+  if (!state && lockoutButton.getState() && centerStackButton.getState() && allStacksButton.getState()) {
     digitalWrite(LED1, LOW);
     digitalWrite(LED2, HIGH);
     digitalWrite(LED3, LOW);
@@ -51,7 +51,7 @@ void outerStacksPushed(int state) {
 }
 
 void allStacksPushed(int state) {
-  if (state && lockoutButton.getState() && centerStackButton.getState() && outerStacksButton.getState()) {
+  if (!state && lockoutButton.getState() && centerStackButton.getState() && outerStacksButton.getState()) {
     digitalWrite(LED1, LOW);
     digitalWrite(LED2, LOW);
     digitalWrite(LED3, HIGH);
