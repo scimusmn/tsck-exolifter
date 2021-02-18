@@ -1,7 +1,7 @@
-//this program monitors the high/low states of three pushbuttons and one lockout switch.
-//when one of the pushbuttons goes low, a corrresponding LED turns "on", and the other LEDs turn "off".
-//the pushbuttons are interlocked, so that while one is pushed, the other two are ignored.
-//if the lockout switch is set low, all three pushbuttons are ignored, but the last LED that was turned on stays "on".
+//This code monitors the high/low states of three pushbuttons and one lockout switch.
+//When one of the pushbuttons goes "low", a corrresponding LED turns "on", and the other LEDs turn "off".
+//The pushbuttons are interlocked, so that while one is being pushed, the other two are ignored.
+//If the lockout switch is set "low", all three pushbuttons are ignored, but the last LED that was turned on stays "on".
 
 //included libraries
 #include "Button.h"
