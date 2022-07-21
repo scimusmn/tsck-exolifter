@@ -4,6 +4,8 @@
 #include "Button.h"
 #include "Weights.h"
 #include "Leds.h"
+#include "SerialPrintf.h"
+#include "IntervalTimer.h"
 
 #define BUTTON_LOW 6
 #define BUTTON_MED 7
@@ -16,17 +18,22 @@
 class LockoutButton : public smm::Button {
 	protected:
 	bool locked;
+	IntervalTimer& timer;
 
 	void onPress() {
+		SerialPrintf("lockout: locked\n");
 		locked = true;
+		timer.stop();
 	}
 
 	void onRelease() {
+		SerialPrintf("lockout: unlocked\n");
 		locked = false;
+		timer.start();
 	}
 
 	public:
-	LockoutButton(int pin) : Button(pin) { locked = false; }
+	LockoutButton(int pin, IntervalTimer& timer) : Button(pin), timer(timer) { locked = false; }
 	bool isLocked() { return locked; }
 };
 
@@ -46,8 +53,12 @@ class InterlockedButton : public smm::Button {
 	virtual void onInterlockPress() {}
 
 	void onPress() {
+		SerialPrintf("Button on pin %d pressed\n", buttonPin);
 		/* if interlock button is locked, do nothing */
-		if (interlock.isLocked()) return;
+		if (interlock.isLocked()) {
+			SerialPrintf("Interlock enabled; press on %d has no effect\n", buttonPin);
+			return;
+		}
 		onInterlockPress();
 	}
 };
@@ -60,8 +71,10 @@ class ButtonLow : public InterlockedButton {
 		: InterlockedButton(pin, interlock, leds, weights) 
 	{}
 	void onInterlockPress() {
+		SerialPrintf("Select low weight\n");
 		leds.set(1, 0, 0);
 		weights.selectCenter();
+		Serial.println();
 	}
 };
 
@@ -73,8 +86,10 @@ class ButtonMed : public InterlockedButton {
 		: InterlockedButton(pin, interlock, leds, weights) 
 	{}
 	void onInterlockPress() {
+		SerialPrintf("Select medium weight\n");
 		leds.set(0, 1, 0);
 		weights.selectOuter();
+		Serial.println();
 	}
 };
 
@@ -86,8 +101,10 @@ class ButtonHi : public InterlockedButton {
 		: InterlockedButton(pin, interlock, leds, weights) 
 	{}
 	void onInterlockPress() {
+		SerialPrintf("Select high weight\n");
 		leds.set(0, 0, 1);
 		weights.selectAll();
+		Serial.println();
 	}
 };
 
@@ -102,8 +119,8 @@ class Buttons {
 
 	public:
 	Buttons(int lowPin, int medPin, int hiPin, int lockoutPin, 
-		Leds& leds, Weights& weights)
-		: lockout(lockoutPin),
+		IntervalTimer& timer, Leds& leds, Weights& weights)
+		: lockout(lockoutPin, timer),
 		  low(lowPin, lockout, leds, weights),
 		  med(medPin, lockout, leds, weights),
 		  hi (hiPin,  lockout, leds, weights)

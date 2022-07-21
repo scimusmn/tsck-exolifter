@@ -1,9 +1,13 @@
 #pragma once
 
+#include <Arduino.h>
+#include "SerialPrintf.h"
+
 class Weights {
 	protected:
 		int emLeft, emCenter, emRight;
 		void select(bool left, bool center, bool right) {
+			SerialPrintf("Magnet state: [%d, %d, %d]\n", left, center, right);
 			digitalWrite(emLeft, left);
 			digitalWrite(emCenter, center);
 			digitalWrite(emRight, right);

@@ -5,7 +5,7 @@
 
 namespace smm {
 	class Button {
-		private:
+		protected:
 		unsigned int buttonPin;
 		bool inverted;
 		bool isPressed;

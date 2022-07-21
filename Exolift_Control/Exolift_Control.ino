@@ -9,6 +9,7 @@
 #include "Button.h"
 #include "ButtonLockout.h"
 #include "IntervalTimer.h"
+#include "SerialPrintf.h"
 
 // Leds
 #define LED1 A0
@@ -28,37 +29,37 @@ Weights weights(EM_LEFT, EM_CENTER, EM_RIGHT);
 #define BUTTON_MED 7
 #define BUTTON_HI  8
 #define BUTTON_LOCKOUT 9
-Buttons buttons(BUTTON_LOW, BUTTON_MED, BUTTON_HI, BUTTON_LOCKOUT, leds, weights);
-
+#define NO_ACTIVITY_TIMEOUT 20000
+IntervalTimer weightTimeout(NO_ACTIVITY_TIMEOUT);
+Buttons buttons(BUTTON_LOW, BUTTON_MED, BUTTON_HI, BUTTON_LOCKOUT, weightTimeout, leds, weights);
 
 // Valve
 #define VALVE_PIN 5
 #define BUTTON_HANDLE 10
-
-IntervalTimer weightTimeout(60000);
 class HandleButton : public smm::Button {
 	protected:
 	int valvePin;
-	IntervalTimer& timeout;
 
 	public:
-	HandleButton(int pin, int valvePin, IntervalTimer& timeout) : Button(pin), timeout(timeout) {
+	HandleButton(int pin, int valvePin) : Button(pin), valvePin(valvePin) {
 		pinMode(valvePin, OUTPUT);
 	}
+
 	void onPress() {
-		timeout.stop();
+		SerialPrintf("handle activated\n");
 		digitalWrite(valvePin, 1);
 	}
 
 	void onRelease() {
-		timeout.start();
+		SerialPrintf("handle released\n");
 		digitalWrite(valvePin, 0);
 	}
-} handle(BUTTON_HANDLE, VALVE_PIN, weightTimeout);
+} handle(BUTTON_HANDLE, VALVE_PIN);
 
 
 void setup() {
-	Serial.begin(9600);
+	Serial.begin(115200);
+	SerialPrintf("arduino ready!\n");
 }
 
 
@@ -66,6 +67,7 @@ void loop() {
 	buttons.update();
 	handle.update();
 	if (weightTimeout.triggered()) {
+		SerialPrintf("timed out!\n");
 		leds.set(0, 0, 0);
 		weights.selectNone();
 	}
