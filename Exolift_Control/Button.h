@@ -1,49 +1,70 @@
-#include "Arduino.h"
+#ifndef SMM_BUTTON_H
+#define SMM_BUTTON_H
 
-// ensure this library description is only included once
-#ifndef Button_h
-#define Button_h
+#include <Arduino.h>
 
-class Button {
-private:
-  int pin;
-  bool lastPinState;
-  int debounce;
-  unsigned long pinChangeMillis;
-  bool buttonState;
-  void (*callback)(int);
+namespace smm {
+	class Button {
+		private:
+		unsigned int buttonPin;
+		bool inverted;
+		bool isPressed;
+		unsigned long debounceStartTime;
+		unsigned long debounceTime;
+		bool debouncing;
 
-public:
-  // constructor (pin, callback function, [optional] debounce in millis)
-  Button(int p, void (*CB)(int), int _debounce = 20) {
-    callback = CB;
-    pin = p;
-    pinMode(p, INPUT_PULLUP);
-    debounce = _debounce;
-    lastPinState = buttonState = (digitalRead(pin));
-  }
+		bool getState() {
+			bool state = !digitalRead(buttonPin);
+			if (inverted)
+				return !state;
+			return state;
+		}
 
-  // returns the button state
-  bool getState() {
-    return buttonState;
-  }
+		bool debounceDone() {
+			return millis() - debounceStartTime > debounceTime;
+		}
 
-  //run in a loop when button press should be noticed.
-  void update() {
-    bool pinState = digitalRead(pin);
+		public:
 
-    //if the state of the pin has changed.
-    if (pinState != lastPinState) {
-      lastPinState = pinState;
-      pinChangeMillis = millis();
-    }
+		Button(unsigned int pin, unsigned long debounceTime=5, bool inverted=false) :
+			buttonPin(pin), inverted(inverted), debounceTime(debounceTime), debouncing(false)
+	       	{
+			pinMode(buttonPin, INPUT_PULLUP);
+			isPressed = getState();
+		}
 
-    //if the pin state was stable for the debounce value in millis.
-    if (((millis() - pinChangeMillis) > debounce) && buttonState != pinState) {
-      buttonState = pinState;
-      callback(buttonState);
-    }
-  }
-};
+		virtual void onPress() {}
+		virtual void onRelease() {}
+		virtual void whilePressed() {}
+		virtual void whileReleased() {}
+
+		void update() {
+			if (debouncing) {
+				if (debounceDone()) {
+					isPressed = getState();
+					debouncing = false;
+					if (isPressed)
+						onPress();
+					else
+						onRelease();
+				}
+					
+			}
+			else { /* not debouncing */
+				bool state = getState();
+				if (state != isPressed) {
+					debouncing = true;
+					debounceStartTime = millis();
+				}
+			}
+
+			if (isPressed)
+				whilePressed();
+			else
+				whileReleased();
+		}
+
+	};
+}
 
 #endif
